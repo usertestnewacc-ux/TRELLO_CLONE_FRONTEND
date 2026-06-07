@@ -74,10 +74,6 @@ import { AuthService } from './auth.service';
           Don't have an account?
           <a routerLink="/register" class="auth-link">Sign up for free</a>
         </div>
-
-        <div class="demo-hint">
-          <strong>Demo:</strong> admin&#64;trello.local / Admin123!
-        </div>
       </div>
     </div>
   `,
@@ -170,7 +166,7 @@ export class LoginComponent {
   loading = signal(false);
   showPassword = signal(false);
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) { }
 
   async submit() {
     if (!this.email.trim() || !this.password) return;
