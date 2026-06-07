@@ -1,0 +1,701 @@
+<style>
+  :host { display: block; }
+
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    height: 48px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.1), 0 0 1px rgba(9, 30, 66, 0.2);
+    border-bottom: 1px solid #dfe1e6;
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: #42526e;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .nav-btn-icon:hover {
+    background: rgba(9, 30, 66, 0.08);
+    color: #172b4d;
+  }
+  .nav-btn-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #172b4d;
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    transition: background 0.15s;
+  }
+  .nav-logo:hover {
+    background: rgba(9, 30, 66, 0.08);
+  }
+  .nav-logo-icon {
+    width: 20px;
+    height: 20px;
+    background: #0052cc;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-logo-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .nav-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: flex-start;
+    margin-left: 16px;
+  }
+
+  .search-container {
+    position: relative;
+    width: 260px;
+    display: flex;
+    align-items: center;
+  }
+  .search-input {
+    width: 100%;
+    height: 32px;
+    background: #ffffff;
+    border: 1px solid #dfe1e6;
+    border-radius: 4px;
+    padding: 0 28px 0 32px;
+    font-size: 0.85rem;
+    color: #172b4d;
+    transition: width 0.15s ease, border-color 0.15s;
+  }
+  .search-input:focus {
+    border-color: #0052cc;
+    outline: none;
+    box-shadow: 0 0 0 1px #0052cc;
+    width: 300px;
+  }
+  .search-icon {
+    position: absolute;
+    left: 8px;
+    color: #5e6c84;
+    font-size: 0.85rem;
+    pointer-events: none;
+  }
+  .search-clear-btn {
+    position: absolute;
+    right: 6px;
+    background: transparent;
+    border: none;
+    color: #5e6c84;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    border-radius: 2px;
+    line-height: 1;
+  }
+  .search-clear-btn:hover { color: #172b4d; }
+
+  /* Search results dropdown */
+  .search-results-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 360px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(9,30,66,0.18), 0 0 1px rgba(9,30,66,0.12);
+    z-index: 500;
+    overflow: hidden;
+    animation: dropFadeIn 0.12s ease;
+  }
+  .search-results-header {
+    padding: 8px 14px 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #5e6c84;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #f4f5f7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .search-result-count {
+    font-size: 0.65rem;
+    color: #8993a4;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.1s;
+    text-decoration: none;
+  }
+  .search-result-item:hover { background: #f4f5f7; }
+  .search-result-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+  .search-result-icon.icon-ws    { background: #fff0b3; }
+  .search-result-icon.icon-board { background: #e8f0fe; }
+  .search-result-icon.icon-card  { background: #e3fcef; }
+  .search-result-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+  .search-result-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #172b4d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .search-result-sub {
+    font-size: 0.72rem;
+    color: #5e6c84;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .search-result-type-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .badge-workspace { background:#fff0b3; color:#7a6000; }
+  .badge-board     { background:#e8f0fe; color:#0052cc; }
+  .badge-card      { background:#e3fcef; color:#1d7f54; }
+  .search-no-results {
+    padding: 24px 14px;
+    text-align: center;
+    color: #5e6c84;
+    font-size: 0.85rem;
+  }
+  .search-no-results span { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+  .search-no-results p { margin: 4px 0 0; font-size: 0.75rem; color: #8993a4; }
+  .search-footer {
+    padding: 6px 14px;
+    border-top: 1px solid #f4f5f7;
+    font-size: 0.72rem;
+    color: #8993a4;
+    text-align: center;
+  }
+  .search-loading {
+    padding: 16px 14px;
+    text-align: center;
+    color: #5e6c84;
+    font-size: 0.82rem;
+  }
+
+  /* Create dropdown */
+  .create-dropdown {
+    min-width: 200px;
+    left: 0;
+    right: auto;
+  }
+
+  .btn-create {
+    height: 32px;
+    background: #0052cc;
+    color: #ffffff;
+    border: none;
+    border-radius: 3px;
+    padding: 0 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-create:hover {
+    background: #0747a6;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .nav-auth-btn {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: background 0.15s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-login {
+    color: #172b4d;
+    background: transparent;
+  }
+  .btn-login:hover {
+    background: rgba(9, 30, 66, 0.08);
+  }
+  .btn-register {
+    color: #ffffff;
+    background: #0052cc;
+  }
+  .btn-register:hover {
+    background: #0747a6;
+  }
+
+  /* User avatar button */
+  .user-avatar-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #6554c0;
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+    border: none;
+    position: relative;
+  }
+  .user-avatar-btn:hover {
+    opacity: 0.85;
+    box-shadow: 0 0 0 2px rgba(101, 84, 192, 0.4);
+  }
+
+  /* Dropdown menus */
+  .dropdown-wrapper {
+    position: relative;
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(9,30,66,0.18), 0 0 1px rgba(9,30,66,0.12);
+    z-index: 500;
+    min-width: 240px;
+    overflow: hidden;
+    animation: dropFadeIn 0.15s ease;
+  }
+  @keyframes dropFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Profile dropdown */
+  .profile-dropdown {
+    min-width: 260px;
+  }
+  .profile-header {
+    padding: 16px;
+    border-bottom: 1px solid #dfe1e6;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .profile-avatar-large {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #6554c0;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .profile-info strong {
+    display: block;
+    font-size: 0.9rem;
+    color: #172b4d;
+    font-weight: 700;
+  }
+  .profile-info span {
+    display: block;
+    font-size: 0.78rem;
+    color: #5e6c84;
+    margin-top: 2px;
+  }
+  .dropdown-section-label {
+    padding: 10px 16px 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #5e6c84;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    font-size: 0.875rem;
+    color: #172b4d;
+    cursor: pointer;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    transition: background 0.12s;
+  }
+  .dropdown-item:hover {
+    background: #f4f5f7;
+  }
+  .dropdown-item.danger {
+    color: #de350b;
+  }
+  .dropdown-item.danger:hover {
+    background: #ffebe6;
+  }
+  .dropdown-divider {
+    height: 1px;
+    background: #dfe1e6;
+    margin: 4px 0;
+  }
+  .dropdown-item-icon {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  /* App switcher dropdown */
+  .app-switcher-dropdown {
+    min-width: 200px;
+    right: auto;
+    left: 0;
+  }
+  .app-switcher-title {
+    padding: 12px 16px 8px;
+    font-size: 0.78rem;
+    color: #5e6c84;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #dfe1e6;
+  }
+  .app-switcher-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 8px;
+  }
+  .app-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    transition: background 0.15s;
+    text-decoration: none;
+  }
+  .app-tile:hover {
+    background: #f4f5f7;
+  }
+  .app-tile-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+  .app-tile-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #172b4d;
+  }
+
+  /* Overlay to close menus on outside click */
+  .menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 199;
+  }
+
+  .main-content {
+    min-height: calc(100vh - 48px);
+    background: #fafbfc;
+  }
+</style>
+
+<!-- Close menus when clicking outside -->
+<div class="menu-overlay" *ngIf="showProfileMenu() || showAppSwitcher() || showCreateMenu() || showSearchResults()" (click)="closeMenus()"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <!-- Grid / App Switcher icon -->
+    <div class="dropdown-wrapper">
+      <button class="nav-btn-icon" type="button" title="More apps" (click)="toggleAppSwitcher($event)">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/>
+        </svg>
+      </button>
+      <!-- App Switcher Dropdown -->
+      <div class="dropdown-menu app-switcher-dropdown" *ngIf="showAppSwitcher()" (click)="$event.stopPropagation()">
+        <div class="app-switcher-title">Switch to</div>
+        <div class="app-switcher-grid">
+          <a class="app-tile" routerLink="/dashboard" (click)="closeMenus()">
+            <div class="app-tile-icon" style="background:#e6fcff;">⚡</div>
+            <span class="app-tile-label">Home</span>
+          </a>
+          <a class="app-tile" routerLink="/boards" (click)="closeMenus()">
+            <div class="app-tile-icon" style="background:#e8f0fe;">📋</div>
+            <span class="app-tile-label">Boards</span>
+          </a>
+          <a class="app-tile" routerLink="/workspaces" (click)="closeMenus()">
+            <div class="app-tile-icon" style="background:#fff0b3;">💼</div>
+            <span class="app-tile-label">Workspaces</span>
+          </a>
+          <a class="app-tile" routerLink="/cards" (click)="closeMenus()">
+            <div class="app-tile-icon" style="background:#e3fcef;">🗂</div>
+            <span class="app-tile-label">Cards</span>
+          </a>
+          <a class="app-tile" routerLink="/reports" (click)="closeMenus()">
+            <div class="app-tile-icon" style="background:#ffebe6;">📊</div>
+            <span class="app-tile-label">Reports</span>
+          </a>
+          <a class="app-tile" routerLink="/activity-logs" (click)="closeMenus()">
+            <div class="app-tile-icon" style="background:#f4f5f7;">🕒</div>
+            <span class="app-tile-label">Activity</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <a class="nav-logo" routerLink="/">
+      <span class="nav-logo-icon">
+        <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="5" height="11" rx="1" fill="#ffffff"/>
+          <rect x="11" y="2" width="5" height="7" rx="1" fill="#ffffff"/>
+        </svg>
+      </span>
+      Trello
+    </a>
+  </div>
+
+  <div class="nav-center" *ngIf="authService.isAuthenticated()">
+    <!-- Search with results dropdown -->
+    <div class="search-container" (click)="$event.stopPropagation()">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search workspaces, boards, cards..."
+        [value]="searchQuery()"
+        (input)="onSearchInput($any($event.target).value)"
+        (keydown.escape)="clearSearch()"
+        (keydown.enter)="searchResults().length > 0 ? onSearchResultClick(searchResults()[0]) : null"
+        id="global-search-input"
+        autocomplete="off" />
+      <button class="search-clear-btn" *ngIf="searchQuery()" (click)="clearSearch()" title="Clear search">✕</button>
+
+      <!-- Search results dropdown -->
+      <div class="search-results-dropdown" *ngIf="showSearchResults()">
+        <!-- Results exist -->
+        <ng-container *ngIf="searchResults().length > 0">
+          <div class="search-results-header">
+            Best matches
+            <span class="search-result-count">{{ searchResults().length }} result{{ searchResults().length !== 1 ? 's' : '' }}</span>
+          </div>
+          <div *ngFor="let result of searchResults()"
+               class="search-result-item"
+               (click)="onSearchResultClick(result)">
+            <span class="search-result-icon"
+                  [class.icon-ws]="result.type === 'workspace'"
+                  [class.icon-board]="result.type === 'board'"
+                  [class.icon-card]="result.type === 'card'">
+              {{ result.type === 'workspace' ? '💼' : result.type === 'board' ? '📋' : '🗂' }}
+            </span>
+            <div class="search-result-info">
+              <span class="search-result-name">{{ result.name }}</span>
+              <span class="search-result-sub" *ngIf="result.subTitle">{{ result.subTitle }}</span>
+            </div>
+            <span class="search-result-type-badge"
+                  [class.badge-workspace]="result.type === 'workspace'"
+                  [class.badge-board]="result.type === 'board'"
+                  [class.badge-card]="result.type === 'card'">
+              {{ result.type }}
+            </span>
+          </div>
+          <div class="search-footer">Click a result or press Enter for top match</div>
+        </ng-container>
+        <!-- No results (only show when user has typed something) -->
+        <div class="search-no-results" *ngIf="searchResults().length === 0">
+          <span>🔍</span>
+          <p>No results for "{{ searchQuery() }}"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create dropdown -->
+    <div class="dropdown-wrapper">
+      <button class="btn-create" type="button" (click)="toggleCreateMenu($event)">Create ▾</button>
+      <div class="dropdown-menu create-dropdown" *ngIf="showCreateMenu()" (click)="$event.stopPropagation()">
+        <div class="dropdown-section-label">Create</div>
+        <a routerLink="/boards" class="dropdown-item" (click)="closeMenus()">
+          <span class="dropdown-item-icon">📋</span>
+          Create Board
+        </a>
+        <a routerLink="/workspaces" class="dropdown-item" (click)="closeMenus()">
+          <span class="dropdown-item-icon">💼</span>
+          Create Workspace
+        </a>
+        <a routerLink="/dashboard" class="dropdown-item" (click)="closeMenus()">
+          <span class="dropdown-item-icon">⚡</span>
+          Go to Home
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <ng-container *ngIf="!authService.isAuthenticated()">
+      <a routerLink="/login" class="nav-auth-btn btn-login">Log in</a>
+      <a routerLink="/register" class="nav-auth-btn btn-register">Sign up</a>
+    </ng-container>
+
+    <ng-container *ngIf="authService.isAuthenticated()">
+      <!-- Info icon -->
+      <button class="nav-btn-icon" type="button" title="What's new">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+      </button>
+
+      <!-- Bell icon -->
+      <button class="nav-btn-icon" type="button" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1-1.5-1s-1.5.17-1.5 1v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+        </svg>
+      </button>
+
+      <!-- Help icon -->
+      <button class="nav-btn-icon" type="button" title="Help">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+        </svg>
+      </button>
+
+      <!-- Profile avatar with dropdown -->
+      <div class="dropdown-wrapper">
+        <button
+          class="user-avatar-btn"
+          type="button"
+          [title]="authService.user()?.email ?? ''"
+          (click)="toggleProfileMenu($event)"
+          id="profile-avatar-btn">
+          {{ authService.initials() }}
+        </button>
+
+        <!-- Profile Dropdown -->
+        <div class="dropdown-menu profile-dropdown" *ngIf="showProfileMenu()" (click)="$event.stopPropagation()">
+          <div class="profile-header">
+            <div class="profile-avatar-large">{{ authService.initials() }}</div>
+            <div class="profile-info">
+              <strong>{{ authService.displayName() }}</strong>
+              <span>{{ authService.user()?.email }}</span>
+            </div>
+          </div>
+
+          <div class="dropdown-section-label">Account</div>
+          <a routerLink="/workspaces" class="dropdown-item" (click)="closeMenus()">
+            <span class="dropdown-item-icon">👤</span>
+            Profile &amp; Visibility
+          </a>
+          <a routerLink="/activity-logs" class="dropdown-item" (click)="closeMenus()">
+            <span class="dropdown-item-icon">🕒</span>
+            Activity
+          </a>
+          <a routerLink="/cards" class="dropdown-item" (click)="closeMenus()">
+            <span class="dropdown-item-icon">🗂</span>
+            Cards
+          </a>
+
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section-label">Trello</div>
+          <a routerLink="/workspaces" class="dropdown-item" (click)="closeMenus()">
+            <span class="dropdown-item-icon">💼</span>
+            Workspaces
+          </a>
+          <a routerLink="/reports" class="dropdown-item" (click)="closeMenus()">
+            <span class="dropdown-item-icon">📊</span>
+            Reports
+          </a>
+
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item danger" type="button" (click)="authService.logout(); closeMenus()">
+            <span class="dropdown-item-icon">🚪</span>
+            Log out
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</nav>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
