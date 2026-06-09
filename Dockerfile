@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:20 AS build
 
 WORKDIR /app
 
@@ -10,11 +10,9 @@ COPY . .
 
 RUN npx ng build
 
-FROM nginx:alpine AS serve
+FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-COPY --from=build /app/dist/TRELLI_UI/browser /usr/share/nginx/html
+COPY --from=build /app/dist/* /usr/share/nginx/html
 
 EXPOSE 80
 
